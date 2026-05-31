@@ -46,11 +46,11 @@ show_help() {
 	printf '%s\n' "    $0 [OPTIONS]"
 	printf '\n'
 	print_warn "OPTIONS:"
-	printf '%s\n' "    --help              Show this help message"
-	printf '%s\n' "    --select            Force model selection prompt"
-	printf '%s\n' "    --model MODELNAME   Use the specified model directly"
-	printf '%s\n' "    --reset             Forget the saved last-model preference"
-	printf '%s\n' "    --test              Test Ollama server and Claude Code and exit"
+	printf '%s\n' "    -h, --help              Show this help message"
+	printf '%s\n' "    -s, --select            Force model selection prompt"
+	printf '%s\n' "    -m, --model MODELNAME   Use the specified model directly"
+	printf '%s\n' "    -r, --reset             Forget the saved last-model preference"
+	printf '%s\n' "    -t, --test              Test Ollama server and Claude Code and exit"
 	printf '\n'
 	print_warn "REQUIREMENTS:"
 	printf '%s\n' "    - Ollama installed and running"
@@ -59,11 +59,11 @@ show_help() {
 	printf '\n'
 	print_warn "EXAMPLES:"
 	printf '%s\n' "    $0                              # Use last model or prompt"
-	printf '%s\n' "    $0 --select                     # Force model selection"
-	printf '%s\n' "    $0 --model llama3.2             # Use specific model"
-	printf '%s\n' "    $0 --model codellama:7b         # Use specific model with tag"
-	printf '%s\n' "    $0 --test                       # Test Ollama server connection"
-	printf '%s\n' "    $0 --reset                      # Forget saved model preference"
+	printf '%s\n' "    $0 -s                           # Force model selection"
+	printf '%s\n' "    $0 -m llama3.2                  # Use specific model"
+	printf '%s\n' "    $0 -m codellama:7b              # Use specific model with tag"
+	printf '%s\n' "    $0 -t                           # Test Ollama server connection"
+	printf '%s\n' "    $0 -r                           # Forget saved model preference"
 }
 
 # Escape regex metacharacters so the model name is treated as a literal string.
@@ -211,15 +211,15 @@ main() {
 	# Parse arguments
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
-			--help)
+			--help|-h)
 				show_help
 				exit 0
 				;;
-			--select)
+			--select|-s)
 				force_select=true
 				shift
 				;;
-			--model)
+			--model|-m)
 				if [[ -z "${2:-}" ]]; then
 					print_error "Error: --model requires a model name argument"
 					exit 1
@@ -227,11 +227,11 @@ main() {
 				specified_model="$2"
 				shift 2
 				;;
-			--test)
+			--test|-t)
 				test_ollama
 				exit $?
 				;;
-			--reset)
+			--reset|-r)
 				reset_config
 				exit 0
 				;;
