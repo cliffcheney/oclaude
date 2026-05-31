@@ -1,4 +1,4 @@
-# Oclaude
+# oclaude
 
 **Claude Code Ollama Launcher** — Start Claude Code with local Ollama models.
 
@@ -7,7 +7,6 @@
 - **Model selection menu** — Interactive picker for available Ollama models
 - **Auto-remember** — Saves your last used model for quick relaunch
 - **Server health check** — Built-in `--test` to verify Ollama connectivity
-- **Clean CLI** — Simple, intuitive command-line interface
 
 ## Installation
 
