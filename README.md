@@ -11,12 +11,14 @@
 ## Installation
 
 ```bash
-# Clone or copy the oclaude script
-chmod +x oclaude
+# Copy the script to a directory in your PATH
+cp oclaude ~/bin/oclaude
 
-# Optional: add to your PATH
-sudo ln -s ./oclaude /usr/local/bin/oclaude
+# Make it executable
+chmod +x ~/bin/oclaude
 ```
+
+Ensure `~/bin` is in your PATH (add `export PATH="$HOME/bin:$PATH"` to your shell config if needed).
 
 ## Usage
 
