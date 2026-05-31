@@ -15,7 +15,7 @@
 chmod +x oclaude
 
 # Optional: add to your PATH
-sudo ln -s $(pwd)/oclaude /usr/local/bin/oclaude
+sudo ln -s ./oclaude /usr/local/bin/oclaude
 ```
 
 ## Usage
@@ -45,12 +45,13 @@ oclaude -h
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
-| `--help` | Show help message |
-| `--select` | Force model selection prompt |
-| `--model NAME` | Use specified model directly |
-| `--test` | Test Ollama server and Claude Code and exit |
+| Short | Long | Description |
+|-------|------|-------------|
+| `-h` | `--help` | Show help message |
+| `-s` | `--select` | Force model selection prompt |
+| `-m NAME` | `--model NAME` | Use specified model directly |
+| `-r` | `--reset` | Forget the saved last-model preference |
+| `-t` | `--test` | Test Ollama server and Claude Code and exit |
 
 ## Requirements
 

@@ -43,7 +43,7 @@ show_help() {
 	printf '%s\n' "Starts Claude Code using local Ollama models."
 	printf '\n'
 	print_warn "USAGE:"
-	printf '%s\n' "    $0 [OPTIONS]"
+	printf '%s\n' "    oclaude [OPTIONS]"
 	printf '\n'
 	print_warn "OPTIONS:"
 	printf '%s\n' "    -h, --help              Show this help message"
@@ -58,7 +58,7 @@ show_help() {
 	printf '%s\n' "    - At least one model pulled (e.g., ollama pull llama3.2)"
 	printf '\n'
 	print_warn "EXAMPLES:"
-	printf '%s\n' "    $0                              # Use last model or prompt"
+	printf '%s\n' "    oclaude                      # Use last model or prompt"
 	printf '%s\n' "    oclaude -s                           # Force model selection"
 	printf '%s\n' "    oclaude -m llama3.2                  # Use specific model"
 	printf '%s\n' "    oclaude --model codellama:7b         # Use specific model with tag"
