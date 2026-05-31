@@ -49,7 +49,12 @@ show_help() {
 	printf '%s\n' "    --help              Show this help message"
 	printf '%s\n' "    --select            Force model selection prompt"
 	printf '%s\n' "    --model MODELNAME   Use the specified model directly"
-	printf '%s\n' "    --test              Test Ollama server connection and exit"
+	printf '%s\n' "    --test              Test Ollama server and Claude Code and exit"
+	printf '\n'
+	print_warn "REQUIREMENTS:"
+	printf '%s\n' "    - Ollama installed and running"
+	printf '%s\n' "    - Claude Code CLI installed"
+	printf '%s\n' "    - At least one model pulled (e.g., ollama pull llama3.2)"
 	printf '\n'
 	print_warn "EXAMPLES:"
 	printf '%s\n' "    $0                              # Use last model or prompt"

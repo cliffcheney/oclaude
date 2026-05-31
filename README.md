@@ -44,11 +44,12 @@ sudo ln -s $(pwd)/oclaude /usr/local/bin/oclaude
 | `--help` | Show help message |
 | `--select` | Force model selection prompt |
 | `--model NAME` | Use specified model directly |
-| `--test` | Test Ollama server and exit |
+| `--test` | Test Ollama server and Claude Code and exit |
 
 ## Requirements
 
 - [Ollama](https://ollama.com) installed and running
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI installed
 - At least one model pulled (e.g., `ollama pull llama3.2`)
 
 ## Configuration
