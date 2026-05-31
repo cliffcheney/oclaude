@@ -1,0 +1,217 @@
+#!/bin/bash
+
+# Oclaude - Claude Code Ollama Launcher
+# Starts Claude Code using local Ollama models
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LAST_MODEL_FILE="$HOME/.oclaude-last-model"
+
+# Colors for output
+RED=$'\033[0;31m'
+GREEN=$'\033[0;32m'
+YELLOW=$'\033[1;33m'
+BLUE=$'\033[0;34m'
+NC=$'\033[0m' # No Color
+
+show_help() {
+    echo -e "${BLUE}Oclaude - Claude Code Ollama Launcher${NC}"
+    echo ""
+    echo "Starts Claude Code using local Ollama models."
+    echo ""
+    echo -e "${YELLOW}USAGE:${NC}"
+    echo "    $0 [OPTIONS]"
+    echo ""
+    echo -e "${YELLOW}OPTIONS:${NC}"
+    echo "    --help              Show this help message"
+    echo "    --select            Force model selection prompt"
+    echo "    --model MODELNAME   Use the specified model directly"
+    echo "    --test              Test Ollama server connection and exit"
+    echo ""
+    echo -e "${YELLOW}EXAMPLES:${NC}"
+    echo "    $0                              # Use last model or prompt"
+    echo "    $0 --select                     # Force model selection"
+    echo "    $0 --model llama3.2             # Use specific model"
+    echo "    $0 --model codellama:7b         # Use specific model with tag"
+    echo "    $0 --test                       # Test Ollama server connection"
+}
+
+# Test Ollama server connection
+test_ollama() {
+    echo -e "${BLUE}Testing Ollama server connection...${NC}"
+    echo ""
+
+    # Check if ollama command exists
+    if ! command -v ollama &> /dev/null; then
+        echo -e "${RED}✗ ollama command not found${NC}"
+        echo -e "${YELLOW}Install Ollama: https://ollama.com${NC}"
+        return 1
+    fi
+    echo -e "${GREEN}✓ ollama command found${NC}"
+
+    # Check if server is running
+    if ! ollama ls &> /dev/null; then
+        echo -e "${RED}✗ Ollama server is not running${NC}"
+        echo -e "${YELLOW}Start server: ollama serve${NC}"
+        return 1
+    fi
+    echo -e "${GREEN}✓ Ollama server is running${NC}"
+
+    # Check if we can list models
+    local model_count
+    model_count=$(get_available_models | wc -l)
+    if [[ "$model_count" -eq 0 ]]; then
+        echo -e "${YELLOW}! Ollama server working, but no models installed${NC}"
+        echo -e "${YELLOW}Pull a model: ollama pull <model>${NC}"
+    else
+        echo -e "${GREEN}✓ Found $model_count model(s) available${NC}"
+    fi
+
+    # Quick connectivity test with a simple request
+    local response
+    response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:11434/api/tags 2>/dev/null)
+    if [[ "$response" == "200" ]]; then
+        echo -e "${GREEN}✓ API endpoint responding (HTTP $response)${NC}"
+    else
+        echo -e "${YELLOW}! API endpoint not responding (HTTP $response)${NC}"
+    fi
+
+    echo ""
+    echo -e "${GREEN}Ollama server is healthy!${NC}"
+    return 0
+}
+
+# Get available models
+get_available_models() {
+    ollama ls 2>/dev/null | tail -n +2 | awk '{print $1}'
+}
+
+# Check if a model is available
+is_model_available() {
+    local model="$1"
+    local available
+    available=$(get_available_models)
+
+    # Check exact match or prefix match (for model:tag format)
+    echo "$available" | grep -qE "^${model}(:|$)"
+}
+
+# Select model from available list
+select_model() {
+    local models=()
+    local i=1
+
+    echo -e "${BLUE}Available Ollama models:${NC}" >&2
+    echo "" >&2
+
+    while IFS= read -r model; do
+        if [[ -n "$model" ]]; then
+            models+=("$model")
+            echo -e "  ${GREEN}$i)${NC} $model" >&2
+            ((i++))
+        fi
+    done < <(get_available_models)
+
+    if [[ ${#models[@]} -eq 0 ]]; then
+        echo -e "${RED}No models available. Pull a model first with: ollama pull <model>${NC}" >&2
+        exit 1
+    fi
+
+    echo "" >&2
+
+    local choice
+    while true; do
+        read -p "Select a model (1-${#models[@]}): " choice
+
+        if [[ "$choice" =~ ^[0-9]+$ ]] && [[ "$choice" -ge 1 ]] && [[ "$choice" -le "${#models[@]}" ]]; then
+            echo "${models[$((choice-1))]}"
+            return 0
+        else
+            echo -e "${YELLOW}Invalid selection. Please enter a number between 1 and ${#models[@]}.${NC}" >&2
+        fi
+    done
+}
+
+# Main logic
+main() {
+    local force_select=false
+    local specified_model=""
+
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --help)
+                show_help
+                exit 0
+                ;;
+            --select)
+                force_select=true
+                shift
+                ;;
+            --model)
+                if [[ -z "$2" ]]; then
+                    echo -e "${RED}Error: --model requires a model name argument${NC}"
+                    exit 1
+                fi
+                specified_model="$2"
+                shift 2
+                ;;
+            --test)
+                test_ollama
+                exit $?
+                ;;
+            *)
+                echo -e "${RED}Error: Unknown option: $1${NC}"
+                echo -e "Use ${GREEN}--help${NC} for usage information"
+                exit 1
+                ;;
+        esac
+    done
+
+    # If model specified via --model, use it directly
+    if [[ -n "$specified_model" ]]; then
+        if ! is_model_available "$specified_model"; then
+            echo -e "${RED}Error: Model '$specified_model' is not available${NC}"
+            echo -e "${YELLOW}Run 'ollama pull $specified_model' to download it${NC}"
+            exit 1
+        fi
+        echo -e "${GREEN}Using specified model:${NC} $specified_model"
+        echo "$specified_model" > "$LAST_MODEL_FILE"
+        ollama launch claude --model "$specified_model"
+        exit 0
+    fi
+
+    # If --select flag, force model selection
+    if [[ "$force_select" == true ]]; then
+        local selected
+        selected=$(select_model)
+        echo -e "${GREEN}Using selected model:${NC} $selected"
+        echo "$selected" > "$LAST_MODEL_FILE"
+        ollama launch claude --model "$selected"
+        exit 0
+    fi
+
+    # Try to use last model
+    if [[ -f "$LAST_MODEL_FILE" ]]; then
+        local last_model
+        last_model=$(cat "$LAST_MODEL_FILE")
+
+        if [[ -n "$last_model" ]] && is_model_available "$last_model"; then
+            echo -e "${GREEN}Using last model:${NC} $last_model"
+            ollama launch claude --model "$last_model"
+            exit 0
+        else
+            echo -e "${YELLOW}Last model '$last_model' is no longer available${NC}"
+        fi
+    fi
+
+    # No last model or not available - prompt user
+    local selected
+    selected=$(select_model)
+    echo -e "${GREEN}Using selected model:${NC} $selected"
+    echo "$selected" > "$LAST_MODEL_FILE"
+    ollama launch claude --model "$selected"
+}
+
+main "$@"
