@@ -49,6 +49,7 @@ show_help() {
 	printf '%s\n' "    --help              Show this help message"
 	printf '%s\n' "    --select            Force model selection prompt"
 	printf '%s\n' "    --model MODELNAME   Use the specified model directly"
+	printf '%s\n' "    --reset             Forget the saved last-model preference"
 	printf '%s\n' "    --test              Test Ollama server and Claude Code and exit"
 	printf '\n'
 	print_warn "REQUIREMENTS:"
@@ -62,6 +63,7 @@ show_help() {
 	printf '%s\n' "    $0 --model llama3.2             # Use specific model"
 	printf '%s\n' "    $0 --model codellama:7b         # Use specific model with tag"
 	printf '%s\n' "    $0 --test                       # Test Ollama server connection"
+	printf '%s\n' "    $0 --reset                      # Forget saved model preference"
 }
 
 # Escape regex metacharacters so the model name is treated as a literal string.
@@ -191,6 +193,16 @@ launch_claude() {
 	ollama launch claude --model "$model"
 }
 
+# Reset saved model preference
+reset_config() {
+	if [[ -f "$LAST_MODEL_FILE" ]]; then
+		rm -f "$LAST_MODEL_FILE"
+		print_success "✓ Saved model preference cleared"
+	else
+		print_warn "! No saved model preference to clear"
+	fi
+}
+
 # Main logic
 main() {
 	local force_select=false
@@ -218,6 +230,10 @@ main() {
 			--test)
 				test_ollama
 				exit $?
+				;;
+			--reset)
+				reset_config
+				exit 0
 				;;
 			*)
 				print_error "Error: Unknown option: $1"
