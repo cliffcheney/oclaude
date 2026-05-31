@@ -22,19 +22,25 @@ sudo ln -s $(pwd)/oclaude /usr/local/bin/oclaude
 
 ```bash
 # Use last model (or prompt if none saved)
-./oclaude
+oclaude
 
-# Force model selection
-./oclaude --select
+# Force model selection (short flag)
+oclaude -s
 
-# Use a specific model
-./oclaude --model qwen3.5:397b-cloud
+# Use a specific model (short flag)
+oclaude -m llama3.2
 
-# Test Ollama server connection
-./oclaude --test
+# Use a specific model with tag (long flag)
+oclaude --model codellama:7b
+
+# Test Ollama server and Claude Code
+oclaude -t
+
+# Forget saved model preference
+oclaude --reset
 
 # Show help
-./oclaude --help
+oclaude -h
 ```
 
 ## Options

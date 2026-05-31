@@ -59,11 +59,11 @@ show_help() {
 	printf '\n'
 	print_warn "EXAMPLES:"
 	printf '%s\n' "    $0                              # Use last model or prompt"
-	printf '%s\n' "    $0 -s                           # Force model selection"
-	printf '%s\n' "    $0 -m llama3.2                  # Use specific model"
-	printf '%s\n' "    $0 -m codellama:7b              # Use specific model with tag"
-	printf '%s\n' "    $0 -t                           # Test Ollama server connection"
-	printf '%s\n' "    $0 -r                           # Forget saved model preference"
+	printf '%s\n' "    oclaude -s                           # Force model selection"
+	printf '%s\n' "    oclaude -m llama3.2                  # Use specific model"
+	printf '%s\n' "    oclaude --model codellama:7b         # Use specific model with tag"
+	printf '%s\n' "    oclaude -t                           # Test Ollama server connection"
+	printf '%s\n' "    oclaude --reset                      # Forget saved model preference"
 }
 
 # Escape regex metacharacters so the model name is treated as a literal string.
