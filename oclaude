@@ -30,11 +30,11 @@ print_warn() {
 }
 
 print_success() {
-	printf '%s\n' "${GREEN}${*}${NC}"
+	printf '%s\n' "${GREEN}${*}${NC}" >&2
 }
 
 print_info() {
-	printf '%s\n' "${BLUE}${*}${NC}"
+	printf '%s\n' "${BLUE}${*}${NC}" >&2
 }
 
 show_help() {
